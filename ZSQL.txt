@@ -1,0 +1,124 @@
+/* Dado que los datos tienen caracteres como la ñ y demás es necesario codificarlo en latin*/
+set client_encoding ='LATIN1'
+----------------------------------------------------------------------------
+
+/* Creacion de tablas con cada uno de sus atributos y su tipo */
+----------------------------------------------------------------------------
+/*Creacion de tabla Base*/
+CREATE TABLE Public. base (fecha_hora varchar(100), PM2 varchar (100), SO2 varchar(100) ,
+							 O3 varchar(100));
+
+/*Creacion de tabla Cañaveralejo*/
+CREATE TABLE Public. canaveralejo (fecha_hora varchar(100), PM10 varchar(100), SO2 varchar(100),
+									 Vel_viento_G varchar (100), Dir_Viendto varchar(100),temperatura varchar(100), 
+									 humedad  varchar(100));
+
+/*Creacion de tabla Compartir*/
+CREATE TABLE Public. compartir (fecha date, No_Filtro varchar(100), Concentracion varchar(100), 
+								  temperatura varchar(100), Humedad varchar (100), x varchar(100));
+
+
+/*Creacion de tabla Ermita*/
+CREATE TABLE Public. ermita (fecha_hora varchar (100), PM10 varchar (100), SO2 varchar (100));
+
+/*Creacion de tabla Flora*/
+CREATE TABLE Public. flora (fecha date, pm10 varchar (100), temperatura varchar (100), humedad varchar(100),
+								 radiacion_solar varchar (100), punto_de_rocio varchar (100), lluvia varchar (100));
+
+/*Creacion de tabla ICA*/
+CREATE TABLE Public. ica (fecha date, ERA_Obrero varchar(100), La_Flora varchar(100), Pance varchar(100), 
+							   Univalle varchar(100), Base_Aerea varchar(100), Compartir varchar(100), La_Ermita varchar(100),
+							  Canaveralejo varchar(100), Transitoria varchar(100));
+
+/*Creacion de tabla Obrero*/
+CREATE TABLE Public. obrero (fecha date, PM10 varchar (100), temperatura varchar (100), humedad varchar (100),
+							   radiacion_solar varchar (100), punto_de_rocio varchar (100), lluvia varchar (100));
+	
+
+/*Creacion de tabla Pance*/						   
+CREATE TABLE Public. pance (fecha_hora varchar(100), PM10 varchar (100), O3 varchar (100), Vel_viento varchar (100),
+							  Dir_viendo varchar (100), temperatura varchar (100), Humedad varchar (100), 
+							  Radiacion_solar varchar (100), lluvia varchar (100));
+/*Creacion de tabla Univalle*/								  
+CREATE TABLE Public. univalle (fecha_hora varchar (100), PM2 varchar (100), NO2 varchar (100), O3 varchar (100));
+									 
+------------------------------------------------------------------------
+/* Tabla con coordendas */
+CREATE TABLE Public. estaciones_coordenadas (id int, estacion varchar (100));
+
+
+-----------------------------------------------------------------------------
+/*Muestra de la tabla creada*/
+/* Mostramos un par de tablas para verificar que quedaron como queremos*/
+Select * from ica
+select * from base
+
+/*Obteniendo los valores para cada atributo de la tabla*/
+/*Para poder acceder a cada uno de los archivos es necesario hacer la tabla publica y que todos tengan acceso, lectura y 
+escritura */
+COPY Public. ica FROM 'C:\Users\Univalle\Desktop\Sig2_estaciones\ica.csv' DELIMITER ','  CSV HEADER;
+Copy Public. base FROM 'C:\Users\Univalle\Desktop\Sig2_estaciones\base.csv' DELIMITER ','  CSV HEADER;
+Copy Public. canaveralejo FROM 'C:\Users\Univalle\Desktop\Sig2_estaciones\canaveralejo.csv' DELIMITER ',' CSV HEADER;
+Copy Public. compartir FROM 'C:\Users\Univalle\Desktop\Sig2_estaciones\compartir.csv' DELIMITER ',' CSV HEADER;
+Copy Public. ermita FROM 'C:\Users\Univalle\Desktop\Sig2_estaciones\ermita.csv' DELIMITER ',' CSV HEADER;
+COPY estaciones_coordenadas FROM 'C:\Users\Univalle\Desktop\Sig2_estaciones\estaciones_coordenadas.csv' DELIMITER ',' CSV HEADER;
+Copy Public. flora FROM 'C:\Users\Univalle\Desktop\Sig2_estaciones\flora.csv' DELIMITER ',' CSV HEADER;
+Copy Public. obrero FROM 'C:\Users\Univalle\Desktop\Sig2_estaciones\obrero.csv' DELIMITER ',' CSV HEADER;
+Copy Public. pance FROM 'C:\Users\Univalle\Desktop\Sig2_estaciones\pance.csv' DELIMITER ',' CSV HEADER;
+Copy Public. univalle FROM 'C:\Users\Univalle\Desktop\Sig2_estaciones\univalle.csv' DELIMITER ',' CSV HEADER;
+
+/* Consultas alfanumericas*/
+/*1.Estaciones que miden la calidad del aire*/
+SELECT estaciones_coordenadas.estacion FROM estaciones_Coordenadas;
+
+/*2.Contaminantes que mide la estacion ermita*/
+select column_name from information_schema.columns where table_name = 'ermita';
+
+/*3.¿Cual es el ICA medido por la estacion pance */
+select MAX(ica.pance) from ica;
+
+/*4. En el año 2018 que estaciones tuvieron un ICA mayor o igual a 50*/
+select ica.fecha, ica.pance, ica.era_obrero, ica.la_flora,ica.univalle,ica.base_aerea,
+ica.compartir,ica.la_ermita,ica.canaveralejo from ica where ica.pance>='50' and ica.era_obrero>='50' 
+and ica.la_flora>='50' and ica.univalle>='50' and ica.base_aerea>='50' and ica.compartir>='50' and 
+ica.canaveralejo>='50' and ica.la_ermita>='50';
+
+/*5. Qué estaciones obtuvieron un valor de ICA manor o igual a 30 */
+select ica.fecha, ica.pance, ica.era_obrero, ica.la_flora,ica.univalle,ica.base_aerea,
+ica.compartir,ica.la_ermita,ica.canaveralejo from ica where ica.pance<='30' and ica.era_obrero<='30' 
+and ica.la_flora<='30' and ica.univalle<='30' and ica.base_aerea<='30' and ica.compartir<='30' and 
+ica.canaveralejo<='30' and ica.la_ermita<='30';
+
+/*6.contaminante PM2 se obtuvo en el dia 01/01/2018 las 18:00 para Base*/
+select base.fecha_hora, base.pm2 from Base where base.fecha_hora='01/01/2018 18:00';
+
+/*7.Cuál es la humedad para la estación FLORA  el dia 6/9 /2011 */
+select flora.humedad from flora where flora.fecha='06/09/2018';
+
+/*8.cuál fue el valor de la concentración en univalle CSPM en febrero 15 a las 05:00*/
+select univalle.pm2 from univalle where univalle.fecha_hora='02/15/2018 05:00';
+
+/*9.Que valores de pm2 base y pm10 ermita obtuvieron el día '01/01/2018' a las 05:00*/
+Select base.pm2, ermita.pm10 FROM base inner join ermita on ermita.fecha_hora = base.fecha_hora where base.fecha_hora= '01/01/2018 05:00';
+
+/*10. Las estaciones ermita y flora tuvieron algun valor de pm10 en alguna de las fechas? */
+select ermita.pm10, flora.pm10 from ermita inner join flora on flora.pm10 = ermita.pm10 
+
+
+/* Creacion de funciones */
+/*Funcion para buscar el valor del contaminante pm2 para cualquier fecha que el usuario quiera*/
+create or replace function pm2_base (fechayhora varchar) returns varchar
+as
+$$
+select base.pm2 from base where base.fecha_hora= fechayhora;
+$$
+language SQL
+
+/*prueba de la funcion*/
+select pm2_base ('01/01/2018 00:00')
+
+
+
+
+
+
